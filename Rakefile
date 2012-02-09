@@ -17,8 +17,9 @@ Jeweler::Tasks.new do |gem|
   gem.name = "nsisam"
   gem.homepage = "http://github.com/douglascamata/nsisam"
   gem.license = "MIT"
-  gem.summary = %Q{TODO: one-line summary of your gem}
-  gem.description = %Q{TODO: longer description of your gem}
+  gem.summary = %Q{A simple gem to access a SAM service.}
+  gem.description = %Q{A simple gem to access a SAM node. For more info about SAM
+                       visit www.github.com/nsi-iff/sam_buildout.}
   gem.email = "d.camata@gmail.com"
   gem.authors = ["Douglas Camata"]
   # dependencies defined in Gemfile
