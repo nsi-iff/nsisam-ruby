@@ -1,7 +1,9 @@
 require "json"
 require "net/http"
+require "errors"
 
 module Client
+
   class Client
 
     def initialize(url)
@@ -49,8 +51,8 @@ module Client
       response = Net::HTTP.start @url, @port do |http|
         http.request(request)
       end
+      raise NSISam::Errors::Client::KeyNotFoundError if response.code == "404"
       JSON.parse(response.body)
     end
-
   end
 end
