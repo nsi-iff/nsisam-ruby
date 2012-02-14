@@ -5,10 +5,12 @@ describe NSISam do
   before :all do
     @nsisam = NSISam::Client.new 'http://test:test@localhost:8888'
     @keys = Array.new
+    @fake_sam = NSISam::FakeServer.new.start
   end
 
   after :all do
     @keys.each { |key| @nsisam.delete(key) }
+    @fake_sam.stop
   end
 
   context "storing" do
