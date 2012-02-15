@@ -6,6 +6,10 @@ module Client
 
   class Client
 
+    # Initialize a client to a SAM node hosted at a specific url
+    #
+    # @param [String] url the SAM node url
+    # @return [Client] the object itself
     def initialize(url)
       user_and_pass = url.match(/(\w+):(\w+)/)
       @user, @password = user_and_pass[1], user_and_pass[2]
@@ -13,6 +17,10 @@ module Client
       @port = url.match(/[0-9]{4}/)[0]
     end
 
+    # Store a given data in SAM
+    #
+    # @param [String] data the desired data to store
+    # @return [Hash] response with the data key and checksum
     def store(data)
       request_data = {:value => data}.to_json
       request = prepare_request :PUT, request_data
