@@ -6,6 +6,10 @@ Gemfile.lock
 
 # vim files
 *.swp
+*.swo
+
+# logs folder
+logs
 
 # rdoc generated
 rdoc
