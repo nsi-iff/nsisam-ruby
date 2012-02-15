@@ -1,5 +1,4 @@
 # encoding: utf-8
-
 require 'rubygems'
 require 'bundler'
 begin
@@ -10,6 +9,7 @@ rescue Bundler::BundlerError => e
   exit e.status_code
 end
 require 'rake'
+require 'yard'
 
 require 'jeweler'
 Jeweler::Tasks.new do |gem|
@@ -36,11 +36,6 @@ end
 task :default => :spec
 
 require 'rdoc/task'
-Rake::RDocTask.new do |rdoc|
-  version = File.exist?('VERSION') ? File.read('VERSION') : ""
-
-  rdoc.rdoc_dir = 'rdoc'
-  rdoc.title = "nsisam #{version}"
-  rdoc.rdoc_files.include('README*')
-  rdoc.rdoc_files.include('lib/**/*.rb')
+YARD::Rake::YardocTask.new do |t|
+  t.files   = ['lib/**/*.rb', ]   # optional
 end
