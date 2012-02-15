@@ -5,12 +5,11 @@ describe NSISam do
   before :all do
     @nsisam = NSISam::Client.new 'http://test:test@localhost:8888'
     @keys = Array.new
-    @fake_sam = NSISam::FakeServer.new.start
+    @fake_sam = NSISam::FakeServerManager.new.start_server
   end
 
   after :all do
-    @keys.each { |key| @nsisam.delete(key) }
-    @fake_sam.stop
+    @fake_sam.stop_server
   end
 
   context "storing" do
@@ -19,15 +18,13 @@ describe NSISam do
       response.should_not be_nil
       response.should have_key("key")
       response.should have_key("checksum")
-
-      @keys.push(response["key"])
     end
   end
 
   context "deleting" do
     it "can delete a stored value" do
-      key = @nsisam.store("delete this")["key"]
-      response = @nsisam.delete(key)
+      @nsisam.store("delete this")["key"].should == 'value delete this stored'
+      response = @nsisam.delete("delete this")
       response["deleted"].should be_true
     end
 
@@ -38,30 +35,26 @@ describe NSISam do
 
   context "retrieving" do
     it "can retrieve a stored value" do
-      key = @nsisam.store("retrieve this")["key"]
-      response = @nsisam.get(key)
-      response["data"].should == "retrieve this"
-
-      @keys.push(key)
+      @nsisam.store("retrieve this")["key"].should == 'value retrieve this stored'
+      response = @nsisam.get('retrieve this')
+      response["data"].should == "data for key retrieve this"
     end
 
     it "raises error when key not found" do
-      expect { @nsisam.get("non existing key") }.to raise_error(NSISam::Errors::Client::KeyNotFoundError)
+      expect { @nsisam.get("i dont exist") }.to raise_error(NSISam::Errors::Client::KeyNotFoundError)
     end
   end
 
   context "updating" do
     it "can update values in keys already stored" do
-      key = @nsisam.store("update this")["key"]
-      response = @nsisam.update(key, "updated")
-      response["key"].should == key
+      @nsisam.store("update this")["key"].should == 'value update this stored'
+      response = @nsisam.update('update this', "updated")
+      response["key"].should == 'update this'
       response.should have_key("checksum")
-
-      @keys.push(key)
     end
 
     it "raises error when key not found" do
-      expect { @nsisam.update("ruby is fast", "foo") }.to raise_error(NSISam::Errors::Client::KeyNotFoundError)
+      expect { @nsisam.update("dont exist ruby is fast", "foo") }.to raise_error(NSISam::Errors::Client::KeyNotFoundError)
     end
   end
 
