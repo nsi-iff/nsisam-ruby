@@ -13,8 +13,8 @@ module Client
     def initialize(url)
       user_and_pass = url.match(/(\w+):(\w+)/)
       @user, @password = user_and_pass[1], user_and_pass[2]
-      @url = url.match(/@(\w*)/)[1]
-      @port = url.match(/[0-9]{4}/)[0]
+      @url = url.match(/@(.*):/)[1]
+      @port = url.match(/([0-9]+)(\/)?$/)[1]
     end
 
     # Store a given data in SAM
