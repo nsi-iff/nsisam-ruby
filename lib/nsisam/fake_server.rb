@@ -2,7 +2,6 @@ require "logger"
 require "sinatra"
 require "json"
 require "thread"
-require "errors"
 
 module NSISam
   class Server < Sinatra::Application
