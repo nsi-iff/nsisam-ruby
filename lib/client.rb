@@ -2,8 +2,7 @@ require "json"
 require "net/http"
 require "errors"
 
-module Client
-
+module NSISam
   class Client
 
     # Initialize a client to a SAM node hosted at a specific url

@@ -4,8 +4,7 @@ require "json"
 require "thread"
 require "errors"
 
-module FakeServer
-
+module NSISam
   class Server < Sinatra::Application
 
     configure :development do
@@ -59,4 +58,3 @@ module FakeServer
     end
   end
 end
-
