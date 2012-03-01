@@ -4,6 +4,9 @@ coverage.data
 
 Gemfile.lock
 
+# rvm files
+.rvmrc
+
 # vim files
 *.swp
 *.swo
