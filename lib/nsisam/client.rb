@@ -1,6 +1,6 @@
 require "json"
 require "net/http"
-require "errors"
+require File.dirname(__FILE__) + '/errors'
 
 module NSISam
   class Client
