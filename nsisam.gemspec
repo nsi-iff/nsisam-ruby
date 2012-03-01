@@ -24,10 +24,10 @@ Gem::Specification.new do |s|
     "README.rdoc",
     "Rakefile",
     "VERSION",
-    "lib/client.rb",
-    "lib/errors.rb",
-    "lib/fake_server.rb",
     "lib/nsisam.rb",
+    "lib/nsisam/client.rb",
+    "lib/nsisam/errors.rb",
+    "lib/nsisam/fake_server.rb",
     "nsisam.gemspec",
     "spec/nsisam_spec.rb",
     "spec/spec_helper.rb"
