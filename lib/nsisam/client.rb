@@ -1,5 +1,6 @@
 require "json"
 require "net/http"
+require "digest/sha1"
 require File.dirname(__FILE__) + '/errors'
 
 module NSISam
@@ -56,10 +57,12 @@ module NSISam
     # @raise [NSISam::Errors::Client::KeyNotFoundError] When the key doesn't exists
     # @example
     #   nsisam.get("some key")
-    def get(key)
+    def get(key, expected_checksum=nil)
       request_data = {:key => key}.to_json
       request = prepare_request :GET, request_data
-      execute_request(request)
+      response = execute_request(request)
+      verify_checksum(response["data"], expected_checksum) unless expected_checksum.nil?
+      response
     end
 
     # Update data stored at a given SAM key
@@ -95,5 +98,11 @@ module NSISam
       raise NSISam::Errors::Client::KeyNotFoundError if response.code == "404"
       JSON.parse(response.body)
     end
+
+    def verify_checksum(data, expected_checksum)
+      sha1_checksum = Digest::SHA1.hexdigest(data)
+      raise NSISam::Errors::Client::ChecksumMissmatchError unless sha1_checksum == expected_checksum
+    end
+
   end
 end
