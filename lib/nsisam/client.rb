@@ -101,7 +101,7 @@ module NSISam
 
     def verify_checksum(data, expected_checksum)
       sha1_checksum = Digest::SHA1.hexdigest(data)
-      raise NSISam::Errors::Client::ChecksumMissmatchError unless sha1_checksum == expected_checksum
+      raise NSISam::Errors::Client::ChecksumMismatchError unless sha1_checksum == expected_checksum
     end
 
   end

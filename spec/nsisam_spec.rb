@@ -50,7 +50,7 @@ describe NSISam do
     it "raises errors when expected checksum doesn't match the calculated one" do
       wrong_checksum = 333
       @nsisam.store("retrieve this")["key"].should == 'value retrieve this stored'
-      expect { @nsisam.get('retrieve this', 333) }.to raise_error(NSISam::Errors::Client::ChecksumMissmatchError)
+      expect { @nsisam.get('retrieve this', 333) }.to raise_error(NSISam::Errors::Client::ChecksumMismatchError)
     end
 
     it "raises error when key not found" do

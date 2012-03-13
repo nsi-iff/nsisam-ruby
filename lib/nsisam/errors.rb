@@ -4,7 +4,7 @@ module NSISam
       class KeyNotFoundError < RuntimeError
       end
 
-      class ChecksumMissmatchError < RuntimeError
+      class ChecksumMismatchError < RuntimeError
       end
     end
   end
