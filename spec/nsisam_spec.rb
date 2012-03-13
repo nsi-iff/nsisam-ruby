@@ -40,6 +40,19 @@ describe NSISam do
       response["data"].should == "data for key retrieve this"
     end
 
+    it "can retrieve a stored value and automaticly verify its checksum" do
+      @nsisam.should_receive(:verify_checksum).with('data for key retrieve this', 0).and_return(0)
+      @nsisam.store("retrieve this")["key"].should == 'value retrieve this stored'
+      response = @nsisam.get('retrieve this', 0)
+      response["data"].should == "data for key retrieve this"
+    end
+
+    it "raises errors when expected checksum doesn't match the calculated one" do
+      wrong_checksum = 333
+      @nsisam.store("retrieve this")["key"].should == 'value retrieve this stored'
+      expect { @nsisam.get('retrieve this', 333) }.to raise_error(NSISam::Errors::Client::ChecksumMissmatchError)
+    end
+
     it "raises error when key not found" do
       expect { @nsisam.get("i dont exist") }.to raise_error(NSISam::Errors::Client::KeyNotFoundError)
     end
