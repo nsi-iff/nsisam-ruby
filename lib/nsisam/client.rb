@@ -25,6 +25,9 @@ module NSISam
     # @return [Hash] response with the data key and checksum
     #   * "key" [String] the key to access the stored data
     #   * "checksum" [String] the sha1 checksum of the stored data
+    #
+    # @raise [NSISam::Errors::Client::AuthenticationError] when user and password doesn't match
+    #
     # @example
     #   nsisam.store("something")
     def store(data)
@@ -38,7 +41,10 @@ module NSISam
     # @param [Sring] key of the value to delete
     # @return [Hash] response
     #   * "deleted" [Boolean] true if the key was successfully deleted
-    # @raise [NSISam::Errors::Client::KeyNotFoundError] When the key doesn't exists
+    #
+    # @raise [NSISam::Errors::Client::KeyNotFoundError] when the key doesn't exists
+    # @raise [NSISam::Errors::Client::AuthenticationError] when user and password doesn't match
+    #
     # @example Deleting an existing key
     #   nsisam.delete("some key")
     def delete(key)
@@ -54,7 +60,10 @@ module NSISam
     #   * "from_user" [String] the user who stored the value
     #   * "date" [String] the date when the value was stored
     #   * "data" [String, Hash, Array] the data stored at that key
-    # @raise [NSISam::Errors::Client::KeyNotFoundError] When the key doesn't exists
+    #
+    # @raise [NSISam::Errors::Client::KeyNotFoundError] when the key doesn't exists
+    # @raise [NSISam::Errors::Client::AuthenticationError] when user and password doesn't match
+    #
     # @example
     #   nsisam.get("some key")
     def get(key, expected_checksum=nil)
@@ -72,7 +81,10 @@ module NSISam
     # @return [Hash] response
     #   * "key" [String] just to value key again
     #   * "checksum" [String] the new sha1 checksum of the key's data
-    # @raise [NSISam::Errors::Client::KeyNotFoundError] When the key doesn't exists
+    #
+    # @raise [NSISam::Errors::Client::KeyNotFoundError] when the key doesn't exists
+    # @raise [NSISam::Errors::Client::AuthenticationError] when user and password doesn't match
+    #
     # @example
     #   nsisam.update("my key", "my value")
     def update(key, value)
@@ -96,6 +108,8 @@ module NSISam
         http.request(request)
       end
       raise NSISam::Errors::Client::KeyNotFoundError if response.code == "404"
+      raise NSISam::Errors::Client::MalformedRequestError if response.code == "400"
+      raise NSISam::Errors::Client::AuthenticationError if response.code == "401"
       JSON.parse(response.body)
     end
 

@@ -6,6 +6,12 @@ module NSISam
 
       class ChecksumMismatchError < RuntimeError
       end
+
+      class MalformedRequestError < RuntimeError
+      end
+
+      class AuthenticationError < RuntimeError
+      end
     end
   end
 end
