@@ -6,11 +6,6 @@ require "thread"
 module NSISam
   class Server < Sinatra::Application
 
-    configure :development do
-      Dir.mkdir('logs') unless File.exist?('logs')
-      $stderr.reopen("logs/output.log", "w")
-    end
-
     put "/" do
       content_type :json
       incoming = JSON.parse(request.body.read)
