@@ -1,6 +1,6 @@
 require "json"
 require "net/http"
-require "digest/sha1"
+require "digest/sha512"
 require File.dirname(__FILE__) + '/errors'
 
 module NSISam
@@ -24,7 +24,7 @@ module NSISam
     # @param [String] data the desired data to store
     # @return [Hash] response with the data key and checksum
     #   * "key" [String] the key to access the stored data
-    #   * "checksum" [String] the sha1 checksum of the stored data
+    #   * "checksum" [String] the sha512 checksum of the stored data
     #
     # @raise [NSISam::Errors::Client::AuthenticationError] when user and password doesn't match
     #
@@ -80,7 +80,7 @@ module NSISam
     # @param [String, Hash, Array] data to be stored at the key
     # @return [Hash] response
     #   * "key" [String] just to value key again
-    #   * "checksum" [String] the new sha1 checksum of the key's data
+    #   * "checksum" [String] the new sha512 checksum of the key's data
     #
     # @raise [NSISam::Errors::Client::KeyNotFoundError] when the key doesn't exists
     # @raise [NSISam::Errors::Client::AuthenticationError] when user and password doesn't match
@@ -114,8 +114,8 @@ module NSISam
     end
 
     def verify_checksum(data, expected_checksum)
-      sha1_checksum = Digest::SHA1.hexdigest(data)
-      raise NSISam::Errors::Client::ChecksumMismatchError unless sha1_checksum == expected_checksum
+      sha512_checksum = Digest::SHA512.hexdigest(data)
+      raise NSISam::Errors::Client::ChecksumMismatchError unless sha512_checksum == expected_checksum
     end
 
   end
