@@ -12,6 +12,9 @@ module NSISam
 
       class AuthenticationError < RuntimeError
       end
+
+      class ConnectionRefusedError < RuntimeError
+      end
     end
   end
 end
