@@ -12,6 +12,13 @@ describe NSISam do
     @fake_sam.stop_server
   end
 
+  context "cannot connect to server" do
+    it "throws error if couldn't connect to the server" do
+      sam = NSISam::Client.new 'http://test:test@localhost:4000'
+      expect { sam.store('anything') }.to raise_error(NSISam::Errors::Client::ConnectionRefusedError)
+    end
+  end
+
   context "storing" do
     it "can store a value in SAM" do
       response = @nsisam.store("something")
