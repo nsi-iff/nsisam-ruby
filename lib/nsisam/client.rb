@@ -1,6 +1,6 @@
 require "json"
 require "net/http"
-require "digest/sha512"
+require "digest"
 require File.dirname(__FILE__) + '/errors'
 
 module NSISam
@@ -104,13 +104,18 @@ module NSISam
     end
 
     def execute_request(request)
-      response = Net::HTTP.start @url, @port do |http|
-        http.request(request)
+      begin
+        response = Net::HTTP.start @url, @port do |http|
+          http.request(request)
+        end
+      rescue Errno::ECONNREFUSED => e
+        raise NSISam::Errors::Client::ConnectionRefusedError
+      else
+        raise NSISam::Errors::Client::KeyNotFoundError if response.code == "404"
+        raise NSISam::Errors::Client::MalformedRequestError if response.code == "400"
+        raise NSISam::Errors::Client::AuthenticationError if response.code == "401"
+        JSON.parse(response.body)
       end
-      raise NSISam::Errors::Client::KeyNotFoundError if response.code == "404"
-      raise NSISam::Errors::Client::MalformedRequestError if response.code == "400"
-      raise NSISam::Errors::Client::AuthenticationError if response.code == "401"
-      JSON.parse(response.body)
     end
 
     def verify_checksum(data, expected_checksum)
