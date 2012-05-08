@@ -10,10 +10,11 @@ module NSISam
 
     # Initialize a client to a SAM node hosted at a specific url
     #
-    # @param [String] url the SAM node url
+    # @param [Hash] optional hash with user, password, host and port of the SAM node
     # @return [Client] the object itself
     # @example
-    #   nsisam = NSISam::Client.new 'http://user:pass@ip:port/'
+    #   nsisam = NSISam::Client.new user: 'username' password: 'pass',
+    #                               host: 'localhost', port: '8888'
     def initialize(params = {})
       params = Configuration.settings.merge(params)
       @user = params[:user]
@@ -96,6 +97,17 @@ module NSISam
       execute_request(request)
     end
 
+    # Configure the default values for NSISam::Client objects
+    #
+    # @param [Block]
+    #
+    # @example
+    #   NSISam::Client.configure do
+    #     user     "why"
+    #     password "chunky"
+    #     host     "localhost"
+    #     port     "8888"
+    #   end
     def self.configure(&block)
       Configuration.instance_eval(&block)
     end
