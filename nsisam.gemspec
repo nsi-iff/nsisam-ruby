@@ -37,7 +37,7 @@ Gem::Specification.new do |s|
   s.homepage = "http://github.com/nsi-iff/nsisam-ruby"
   s.licenses = ["MIT"]
   s.require_paths = ["lib"]
-  s.rubygems_version = "1.8.15"
+  s.rubygems_version = "1.8.21"
   s.summary = "A simple gem to access a SAM service."
 
   if s.respond_to? :specification_version then
