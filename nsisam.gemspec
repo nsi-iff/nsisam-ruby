@@ -5,11 +5,11 @@
 
 Gem::Specification.new do |s|
   s.name = "nsisam"
-  s.version = "0.3.4"
+  s.version = "0.4.0"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Douglas Camata"]
-  s.date = "2012-04-28"
+  s.date = "2012-05-08"
   s.description = "A simple gem to access a SAM node. For more info about SAM\n                       visit www.github.com/nsi-iff/sam_buildout."
   s.email = "d.camata@gmail.com"
   s.extra_rdoc_files = [
@@ -26,16 +26,18 @@ Gem::Specification.new do |s|
     "VERSION",
     "lib/nsisam.rb",
     "lib/nsisam/client.rb",
+    "lib/nsisam/configuration.rb",
     "lib/nsisam/errors.rb",
     "lib/nsisam/fake_server.rb",
     "nsisam.gemspec",
+    "spec/configuration_spec.rb",
     "spec/nsisam_spec.rb",
     "spec/spec_helper.rb"
   ]
   s.homepage = "http://github.com/nsi-iff/nsisam-ruby"
   s.licenses = ["MIT"]
   s.require_paths = ["lib"]
-  s.rubygems_version = "1.8.21"
+  s.rubygems_version = "1.8.15"
   s.summary = "A simple gem to access a SAM service."
 
   if s.respond_to? :specification_version then
@@ -47,7 +49,7 @@ Gem::Specification.new do |s|
       s.add_development_dependency(%q<rake>, [">= 0"])
       s.add_development_dependency(%q<yard>, [">= 0"])
       s.add_development_dependency(%q<rspec>, ["~> 2.8.0"])
-      s.add_development_dependency(%q<bundler>, ["~> 1.0.0"])
+      s.add_development_dependency(%q<bundler>, ["~> 1.1.0"])
       s.add_development_dependency(%q<jeweler>, ["~> 1.8.3"])
     else
       s.add_dependency(%q<json>, [">= 0"])
@@ -55,7 +57,7 @@ Gem::Specification.new do |s|
       s.add_dependency(%q<rake>, [">= 0"])
       s.add_dependency(%q<yard>, [">= 0"])
       s.add_dependency(%q<rspec>, ["~> 2.8.0"])
-      s.add_dependency(%q<bundler>, ["~> 1.0.0"])
+      s.add_dependency(%q<bundler>, ["~> 1.1.0"])
       s.add_dependency(%q<jeweler>, ["~> 1.8.3"])
     end
   else
@@ -64,7 +66,7 @@ Gem::Specification.new do |s|
     s.add_dependency(%q<rake>, [">= 0"])
     s.add_dependency(%q<yard>, [">= 0"])
     s.add_dependency(%q<rspec>, ["~> 2.8.0"])
-    s.add_dependency(%q<bundler>, ["~> 1.0.0"])
+    s.add_dependency(%q<bundler>, ["~> 1.1.0"])
     s.add_dependency(%q<jeweler>, ["~> 1.8.3"])
   end
 end
