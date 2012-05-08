@@ -1,6 +1,8 @@
 require "json"
 require "net/http"
 require "digest"
+
+require File.dirname(__FILE__) + '/configuration'
 require File.dirname(__FILE__) + '/errors'
 
 module NSISam
@@ -12,11 +14,12 @@ module NSISam
     # @return [Client] the object itself
     # @example
     #   nsisam = NSISam::Client.new 'http://user:pass@ip:port/'
-    def initialize(url)
-      user_and_pass = url.match(/(\w+):(\w+)/)
-      @user, @password = user_and_pass[1], user_and_pass[2]
-      @url = url.match(/@(.*):/)[1]
-      @port = url.match(/([0-9]+)(\/)?$/)[1]
+    def initialize(params = {})
+      params = Configuration.settings.merge(params)
+      @user = params[:user]
+      @password = params[:password]
+      @host = params[:host]
+      @port = params[:port]
     end
 
     # Store a given data in SAM
@@ -93,6 +96,10 @@ module NSISam
       execute_request(request)
     end
 
+    def self.configure(&block)
+      Configuration.instance_eval(&block)
+    end
+
     private
 
     def prepare_request(verb, body)
@@ -105,7 +112,7 @@ module NSISam
 
     def execute_request(request)
       begin
-        response = Net::HTTP.start @url, @port do |http|
+        response = Net::HTTP.start @host, @port do |http|
           http.request(request)
         end
       rescue Errno::ECONNREFUSED => e

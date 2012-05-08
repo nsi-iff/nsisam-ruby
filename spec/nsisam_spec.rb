@@ -3,7 +3,8 @@ require File.expand_path(File.dirname(__FILE__) + '/spec_helper')
 describe NSISam do
 
   before :all do
-    @nsisam = NSISam::Client.new 'http://test:test@localhost:8888'
+    @nsisam = NSISam::Client.new user: 'test', password: 'test',
+                                 host: 'localhost', port: '8888'
     @keys = Array.new
     @fake_sam = NSISam::FakeServerManager.new.start_server
   end
@@ -14,7 +15,8 @@ describe NSISam do
 
   context "cannot connect to server" do
     it "throws error if couldn't connect to the server" do
-      sam = NSISam::Client.new 'http://test:test@localhost:4000'
+      sam = NSISam::Client.new user: 'test', password: 'test',
+                                   host: 'localhost', port: '4000'
       expect { sam.store('anything') }.to raise_error(NSISam::Errors::Client::ConnectionRefusedError)
     end
   end
@@ -78,4 +80,30 @@ describe NSISam do
     end
   end
 
+  context "get configuration" do
+    before do
+      NSISam::Client.configure do
+        user     "why"
+        password "chunky"
+        host     "localhost"
+        port     "8888"
+      end
+    end
+
+    it "by configure" do
+      sam = NSISam::Client.new
+      sam.instance_variable_get(:@user).should == "why"
+      sam.instance_variable_get(:@password).should == "chunky"
+      sam.instance_variable_get(:@host).should == "localhost"
+      sam.instance_variable_get(:@port).should == "8888"
+    end
+
+    it "by initialize parameters" do
+      sam = NSISam::Client.new(user: 'luckystiff', password: 'bacon', host: 'why.com', port: '9999')
+      sam.instance_variable_get(:@user).should == "luckystiff"
+      sam.instance_variable_get(:@password).should == "bacon"
+      sam.instance_variable_get(:@host).should == "why.com"
+      sam.instance_variable_get(:@port).should == "9999"
+    end
+  end
 end
