@@ -5,11 +5,11 @@
 
 Gem::Specification.new do |s|
   s.name = "nsisam"
-  s.version = "0.4.0"
+  s.version = "0.5.2"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Douglas Camata"]
-  s.date = "2012-05-08"
+  s.date = "2012-05-09"
   s.description = "A simple gem to access a SAM node. For more info about SAM\n                       visit www.github.com/nsi-iff/sam_buildout."
   s.email = "d.camata@gmail.com"
   s.extra_rdoc_files = [
@@ -28,16 +28,18 @@ Gem::Specification.new do |s|
     "lib/nsisam/client.rb",
     "lib/nsisam/configuration.rb",
     "lib/nsisam/errors.rb",
+    "lib/nsisam/fake_client.rb",
     "lib/nsisam/fake_server.rb",
     "nsisam.gemspec",
     "spec/configuration_spec.rb",
+    "spec/fake_client_spec.rb",
     "spec/nsisam_spec.rb",
     "spec/spec_helper.rb"
   ]
   s.homepage = "http://github.com/nsi-iff/nsisam-ruby"
   s.licenses = ["MIT"]
   s.require_paths = ["lib"]
-  s.rubygems_version = "1.8.21"
+  s.rubygems_version = "1.8.15"
   s.summary = "A simple gem to access a SAM service."
 
   if s.respond_to? :specification_version then
