@@ -1,6 +1,7 @@
 = nsisam
 
-Just a simple and lightweight package to access a SAM node using Ruby.
+Just a simple and lightweight package to access a SAM node using Ruby. It also includes a simple fake client to
+be used in your application when a real server is not available to receive requests.
 
 == Contributing to nsisam
 
