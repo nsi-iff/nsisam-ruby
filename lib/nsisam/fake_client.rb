@@ -14,7 +14,7 @@ module NSISam
       if @storage.has_key?(key)
         {'data' => @storage[key]}
       else
-        raise NSISam::Errors::Client::KeyNotFoundErrorlib
+        raise NSISam::Errors::Client::KeyNotFoundError
       end
     end
 
