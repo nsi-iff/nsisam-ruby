@@ -97,9 +97,9 @@ module NSISam
       execute_request(request)
     end
 
-    # Configure the default values for NSISam::Client objects
+    # Pre-configure the NSISam module with default params for the NSISam::Client
     #
-    # @param [Block]
+    # @yield a Configuration object (see {NSISam::Client::Configuration})
     #
     # @example
     #   NSISam::Client.configure do
