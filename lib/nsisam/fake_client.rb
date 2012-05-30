@@ -1,3 +1,5 @@
+require 'json'
+
 module NSISam
   class FakeClient
     def initialize
@@ -6,7 +8,7 @@ module NSISam
 
     def store(data)
       key = Time.now.to_i.to_s
-      @storage[key] = data
+      @storage[key] = JSON.load(data.to_json)
       {'key' => key, 'checksum' => 0}
     end
 
