@@ -1,5 +1,7 @@
 = nsisam
 
+{<img src="https://secure.travis-ci.org/nsi-iff/nsisam-ruby.png"/>}[http://travis-ci.org/nsi-iff/nsisam-ruby]
+
 Just a simple and lightweight package to access a SAM node using Ruby. It also includes a simple fake client to
 be used in your application when a real server is not available to receive requests.
 
@@ -17,4 +19,3 @@ be used in your application when a real server is not available to receive reque
 
 Copyright (c) 2012 Douglas Camata. See LICENSE.txt for
 further details.
-
