@@ -24,17 +24,16 @@ describe NSISam do
   context "storing" do
     it "can store a value in SAM" do
       response = @nsisam.store("something")
-      response.should_not be_nil
-      response.should have_key("key")
-      response.should have_key("checksum")
+      response.should respond_to("key")
+      response.should respond_to("checksum")
     end
   end
 
   context "deleting" do
     it "can delete a stored value" do
-      @nsisam.store("delete this")["key"].should == 'value delete this stored'
+      @nsisam.store("delete this").key.should == 'value delete this stored'
       response = @nsisam.delete("delete this")
-      response["deleted"].should be_true
+      response.should be_deleted
     end
 
     it "raises error when key not found" do
@@ -44,21 +43,21 @@ describe NSISam do
 
   context "retrieving" do
     it "can retrieve a stored value" do
-      @nsisam.store("retrieve this")["key"].should == 'value retrieve this stored'
+      @nsisam.store("retrieve this").key.should == 'value retrieve this stored'
       response = @nsisam.get('retrieve this')
-      response["data"].should == "data for key retrieve this"
+      response.data.should == "data for key retrieve this"
     end
 
     it "can retrieve a stored value and automaticly verify its checksum" do
       @nsisam.should_receive(:verify_checksum).with('data for key retrieve this', 0).and_return(0)
-      @nsisam.store("retrieve this")["key"].should == 'value retrieve this stored'
+      @nsisam.store("retrieve this").key.should == 'value retrieve this stored'
       response = @nsisam.get('retrieve this', 0)
-      response["data"].should == "data for key retrieve this"
+      response.data.should == "data for key retrieve this"
     end
 
     it "raises errors when expected checksum doesn't match the calculated one" do
       wrong_checksum = 333
-      @nsisam.store("retrieve this")["key"].should == 'value retrieve this stored'
+      @nsisam.store("retrieve this").key.should == 'value retrieve this stored'
       expect { @nsisam.get('retrieve this', 333) }.to raise_error(NSISam::Errors::Client::ChecksumMismatchError)
     end
 
@@ -69,10 +68,10 @@ describe NSISam do
 
   context "updating" do
     it "can update values in keys already stored" do
-      @nsisam.store("update this")["key"].should == 'value update this stored'
+      @nsisam.store("update this").key.should == 'value update this stored'
       response = @nsisam.update('update this', "updated")
-      response["key"].should == 'update this'
-      response.should have_key("checksum")
+      response.key.should == 'update this'
+      response.should respond_to("checksum")
     end
 
     it "raises error when key not found" do
