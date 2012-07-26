@@ -5,36 +5,49 @@ require "thread"
 
 module NSISam
   class Server < Sinatra::Application
+    def storage
+      @@storage ||= {}
+    end
+
+    def generate_key
+      rand.to_s
+    end
 
     put "/" do
       content_type :json
       incoming = JSON.parse(request.body.read)
-      {key: "value #{incoming["value"]} stored", checksum: "0"}.to_json
+      key = generate_key
+      storage[key] = incoming['value']
+      { key: key, checksum: "0" }.to_json
     end
 
     get "/" do
       content_type :json
       incoming = JSON.parse(request.body.read)
-      return 404 if incoming["key"].include? "dont"
+      key = incoming["key"]
+      return 404 unless storage.has_key?(key)
       {
         metadata: "this is the metadata",
-        data: "data for key #{incoming["key"]}"
+        data: storage[key]
       }.to_json
     end
 
     delete "/" do
       content_type :json
       incoming = JSON.parse(request.body.read)
-      return 404 if incoming["key"].include? "dont"
-      deleted = incoming["key"].include?("delete")
-      {deleted: deleted}.to_json
+      key = incoming["key"]
+      return 404 unless storage.has_key?(key)
+      storage.delete(key)
+      { deleted: true }.to_json
     end
 
     post "/" do
       content_type :json
       incoming = JSON.parse(request.body.read)
-      return 404 if incoming["key"].include? "dont"
-      {key: incoming["key"], checksum: 0}.to_json
+      key = incoming["key"]
+      return 404 unless storage.has_key?(key)
+      storage[key] = incoming['value']
+      { key: key, checksum: 0 }.to_json
     end
   end
 
