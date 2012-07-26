@@ -5,6 +5,20 @@
 Just a simple and lightweight package to access a SAM node using Ruby. It also includes a simple fake client to
 be used in your application when a real server is not available to receive requests.
 
+== How to test
+
+Just run:
+
+    rake spec
+
+
+By default, all tests are run against a fake server. If you want to use a real SAM, you must create a
+spec/integration.yml file (there is a example file in spec/integration.yml.example) and point it to your
+SAM instance. You must also set the NSI_SAM_INTEGRATION environment variable to any value:
+
+    NSI_SAM_INTEGRATION=1 rake spec
+
+
 == Contributing to nsisam
 
 * Check out the latest master to make sure the feature hasn't been implemented or the bug hasn't been fixed yet.
