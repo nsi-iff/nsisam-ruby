@@ -1,4 +1,5 @@
 require File.expand_path(File.dirname(__FILE__) + '/spec_helper')
+require 'base64'
 
 describe NSISam do
   before :all do
@@ -12,6 +13,8 @@ describe NSISam do
   after :all do
     @fake_sam.stop_server
   end
+  
+  let(:file_content) { example_file_content }
 
   context "cannot connect to server" do
     it "throws error if couldn't connect to the server" do
@@ -27,6 +30,16 @@ describe NSISam do
       response.should_not be_nil
       response.should have_key("key")
       response.should have_key("checksum")
+    end
+
+    context "file" do
+      it "encodes content before storing" do
+        Base64.should_receive(:encode64).with(file_content).
+          and_return(:dummy_value)
+        @nsisam.should_receive(:store).with(doc: :dummy_value).
+          and_return(:dummy_result)
+        @nsisam.store_file(file_content).should == :dummy_result
+      end
     end
   end
 
@@ -65,6 +78,17 @@ describe NSISam do
     it "raises error when key not found" do
       expect { @nsisam.get("i dont exist") }.to raise_error(NSISam::Errors::Client::KeyNotFoundError)
     end
+
+    context 'file' do
+      it 'decodes content after retrieving' do
+        @nsisam.should_receive(:get).with(:key, nil).
+          and_return('data' => { 'doc' => :dummy_value })
+        Base64.should_receive(:decode64).with(:dummy_value).
+          and_return(:decoded_dummy)
+        response = @nsisam.get_file(:key)
+        response['data']['doc'].should == :decoded_dummy
+      end
+    end
   end
 
   context "updating" do
@@ -78,6 +102,27 @@ describe NSISam do
 
     it "raises error when key not found" do
       expect { @nsisam.update("dont exist ruby is fast", "foo") }.to raise_error(NSISam::Errors::Client::KeyNotFoundError)
+    end
+
+    context 'file' do
+      it 'encodes content before updating' do
+        key = @nsisam.store_file(file_content)['key']
+        Base64.should_receive(:encode64).with(:dummy_content).
+          and_return(:dummy_content)
+        @nsisam.should_receive(:update).with(key, doc: :dummy_content).
+          and_return(:dummy_result)
+        @nsisam.update_file(key, :dummy_content).should == :dummy_result
+      end
+    end
+  end
+  
+  context 'file storage without mocking' do
+    it 'stores, retrieves and updates files' do
+      updated_file_content = file_content + 'anything ha!'
+      key = @nsisam.store_file(file_content)['key']
+      @nsisam.get_file(key)['data']['doc'].should == file_content
+      @nsisam.update_file(key, updated_file_content)
+      @nsisam.get_file(key)['data']['doc'].should == updated_file_content
     end
   end
 
