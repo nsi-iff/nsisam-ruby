@@ -7,13 +7,13 @@ describe NSISam do
       port: '8888' }
     @nsisam = NSISam::Client.new(integration_options || fake_options)
     @keys = Array.new
-    @fake_sam = NSISam::FakeServerManager.new.start_server
+    @fake_sam = NSISam::FakeServerManager.new.start_server unless integrating?
   end
 
   after :all do
-    @fake_sam.stop_server
+    @fake_sam.stop_server unless integrating?
   end
-  
+
   let(:file_content) { example_file_content }
 
   context "cannot connect to server" do
@@ -115,7 +115,7 @@ describe NSISam do
       end
     end
   end
-  
+
   context 'file storage without mocking' do
     it 'stores, retrieves and updates files' do
       updated_file_content = file_content + 'anything ha!'
