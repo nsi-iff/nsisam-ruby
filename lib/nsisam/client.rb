@@ -1,6 +1,7 @@
 require "json"
 require "net/http"
 require "digest"
+require "base64"
 
 require File.dirname(__FILE__) + '/configuration'
 require File.dirname(__FILE__) + '/errors'
@@ -38,6 +39,10 @@ module NSISam
       request_data = {:value => data}.to_json
       request = prepare_request :PUT, request_data
       Response.new(execute_request(request))
+    end
+
+    def store_file(file_content)
+      store(doc: Base64.encode64(file_content))
     end
 
     # Delete data at a given SAM key
@@ -78,6 +83,15 @@ module NSISam
       Response.new(response)
     end
 
+    def get_file(key, expected_checksum = nil)
+      response = get(key, expected_checksum)
+      Response.new(
+        'key' => response.key,
+        'checksum' => response.checksum,
+        'data' => Base64.decode64(response.data['doc']),
+        'deleted' => response.deleted?)
+    end
+
     # Update data stored at a given SAM key
     #
     # @param [String] key of the data to update
@@ -95,6 +109,11 @@ module NSISam
       request_data = {:key => key, :value => value}.to_json
       request = prepare_request :POST, request_data
       Response.new(execute_request(request))
+    end
+
+    def update_file(key, value)
+      encoded = Base64.encode64(value)
+      update(key, doc: encoded)
     end
 
     # Pre-configure the NSISam module with default params for the NSISam::Client

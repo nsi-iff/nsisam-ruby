@@ -1,10 +1,11 @@
 require File.expand_path(File.dirname(__FILE__) + '/spec_helper')
+require 'base64'
 
 describe NSISam do
-
   before :all do
-    @nsisam = NSISam::Client.new user: 'test', password: 'test',
-                                 host: 'localhost', port: '8888'
+    fake_options = { user: 'test', password: 'test', host: 'localhost',
+      port: '8888' }
+    @nsisam = NSISam::Client.new(integration_options || fake_options)
     @keys = Array.new
     @fake_sam = NSISam::FakeServerManager.new.start_server
   end
@@ -13,10 +14,12 @@ describe NSISam do
     @fake_sam.stop_server
   end
 
+  let(:file_content) { example_file_content }
+
   context "cannot connect to server" do
     it "throws error if couldn't connect to the server" do
       sam = NSISam::Client.new user: 'test', password: 'test',
-                                   host: 'localhost', port: '4000'
+                               host: 'localhost', port: '4000'
       expect { sam.store('anything') }.to raise_error(NSISam::Errors::Client::ConnectionRefusedError)
     end
   end
@@ -27,12 +30,22 @@ describe NSISam do
       response.should respond_to("key")
       response.should respond_to("checksum")
     end
+
+    context "file" do
+      it "encodes content before storing" do
+        Base64.should_receive(:encode64).with(file_content).
+          and_return(:dummy_value)
+        @nsisam.should_receive(:store).with(doc: :dummy_value).
+          and_return(:dummy_result)
+        @nsisam.store_file(file_content).should == :dummy_result
+      end
+    end
   end
 
   context "deleting" do
     it "can delete a stored value" do
-      @nsisam.store("delete this").key.should == 'value delete this stored'
-      response = @nsisam.delete("delete this")
+      key = @nsisam.store("delete this").key
+      response = @nsisam.delete(key)
       response.should be_deleted
     end
 
@@ -43,39 +56,73 @@ describe NSISam do
 
   context "retrieving" do
     it "can retrieve a stored value" do
-      @nsisam.store("retrieve this").key.should == 'value retrieve this stored'
-      response = @nsisam.get('retrieve this')
-      response.data.should == "data for key retrieve this"
+      key = @nsisam.store("retrieve this").key
+      response = @nsisam.get(key)
+      response.data.should == "retrieve this"
     end
 
     it "can retrieve a stored value and automaticly verify its checksum" do
-      @nsisam.should_receive(:verify_checksum).with('data for key retrieve this', 0).and_return(0)
-      @nsisam.store("retrieve this").key.should == 'value retrieve this stored'
-      response = @nsisam.get('retrieve this', 0)
-      response.data.should == "data for key retrieve this"
+      @nsisam.should_receive(:verify_checksum).with('retrieve this', 0).and_return(0)
+      key = @nsisam.store("retrieve this").key
+      response = @nsisam.get(key, 0)
+      response.data.should == "retrieve this"
     end
 
     it "raises errors when expected checksum doesn't match the calculated one" do
       wrong_checksum = 333
-      @nsisam.store("retrieve this").key.should == 'value retrieve this stored'
-      expect { @nsisam.get('retrieve this', 333) }.to raise_error(NSISam::Errors::Client::ChecksumMismatchError)
+      key = @nsisam.store("retrieve this").key
+      expect { @nsisam.get(key, 333) }.to raise_error(NSISam::Errors::Client::ChecksumMismatchError)
     end
 
     it "raises error when key not found" do
       expect { @nsisam.get("i dont exist") }.to raise_error(NSISam::Errors::Client::KeyNotFoundError)
     end
+
+    context 'file' do
+      it 'decodes content after retrieving' do
+        @nsisam.should_receive(:get).with(:key, nil).
+          and_return(stub(key: 'key', checksum: 999,
+                          data: { 'doc' => :dummy_value }, deleted?: true))
+        Base64.should_receive(:decode64).with(:dummy_value).
+          and_return(:decoded_dummy)
+        response = @nsisam.get_file(:key)
+        response.data.should == :decoded_dummy
+      end
+    end
   end
 
   context "updating" do
     it "can update values in keys already stored" do
-      @nsisam.store("update this").key.should == 'value update this stored'
-      response = @nsisam.update('update this', "updated")
-      response.key.should == 'update this'
-      response.should respond_to("checksum")
+      key = @nsisam.store("update this").key
+      response = @nsisam.update(key, "updated")
+      response.key.should == key
+      response.checksum.should_not be_nil
+      @nsisam.get(key).data.should == 'updated'
     end
 
     it "raises error when key not found" do
       expect { @nsisam.update("dont exist ruby is fast", "foo") }.to raise_error(NSISam::Errors::Client::KeyNotFoundError)
+    end
+
+    context 'file' do
+      it 'encodes content before updating' do
+        key = @nsisam.store_file(file_content).key
+        Base64.should_receive(:encode64).with(:dummy_content).
+          and_return(:dummy_content)
+        @nsisam.should_receive(:update).with(key, doc: :dummy_content).
+          and_return(:dummy_result)
+        @nsisam.update_file(key, :dummy_content).should == :dummy_result
+      end
+    end
+  end
+
+  context 'file storage without mocking' do
+    it 'stores, retrieves and updates files' do
+      updated_file_content = file_content + 'anything ha!'
+      key = @nsisam.store_file(file_content).key
+      @nsisam.get_file(key).data.should == file_content
+      @nsisam.update_file(key, updated_file_content)
+      @nsisam.get_file(key).data.should == updated_file_content
     end
   end
 
