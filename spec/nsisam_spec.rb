@@ -36,7 +36,7 @@ describe NSISam do
       it "encodes content before storing" do
         Base64.should_receive(:encode64).with(file_content).
           and_return(:dummy_value)
-        @nsisam.should_receive(:store).with(doc: :dummy_value).
+        @nsisam.should_receive(:store).with(file: :dummy_value).
           and_return(:dummy_result)
         @nsisam.store_file(file_content).should == :dummy_result
       end
@@ -82,11 +82,11 @@ describe NSISam do
     context 'file' do
       it 'decodes content after retrieving' do
         @nsisam.should_receive(:get).with(:key, nil).
-          and_return('data' => { 'doc' => :dummy_value })
+          and_return('data' => { 'file' => :dummy_value })
         Base64.should_receive(:decode64).with(:dummy_value).
           and_return(:decoded_dummy)
         response = @nsisam.get_file(:key)
-        response['data']['doc'].should == :decoded_dummy
+        response['data']['file'].should == :decoded_dummy
       end
     end
   end
@@ -109,7 +109,7 @@ describe NSISam do
         key = @nsisam.store_file(file_content)['key']
         Base64.should_receive(:encode64).with(:dummy_content).
           and_return(:dummy_content)
-        @nsisam.should_receive(:update).with(key, doc: :dummy_content).
+        @nsisam.should_receive(:update).with(key, file: :dummy_content).
           and_return(:dummy_result)
         @nsisam.update_file(key, :dummy_content).should == :dummy_result
       end
@@ -120,9 +120,9 @@ describe NSISam do
     it 'stores, retrieves and updates files' do
       updated_file_content = file_content + 'anything ha!'
       key = @nsisam.store_file(file_content)['key']
-      @nsisam.get_file(key)['data']['doc'].should == file_content
+      @nsisam.get_file(key)['data']['file'].should == file_content
       @nsisam.update_file(key, updated_file_content)
-      @nsisam.get_file(key)['data']['doc'].should == updated_file_content
+      @nsisam.get_file(key)['data']['file'].should == updated_file_content
     end
   end
 

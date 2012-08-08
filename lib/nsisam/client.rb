@@ -42,7 +42,7 @@ module NSISam
     end
 
     def store_file(file_content)
-      store(doc: Base64.encode64(file_content))
+      store(file: Base64.encode64(file_content))
     end
 
     # Delete data at a given SAM key
@@ -86,7 +86,7 @@ module NSISam
     def get_file(key, expected_checksum = nil)
       response = get(key, expected_checksum)
       
-      response['data']['doc'] = Base64.decode64(response['data']['doc'])
+      response['data']['file'] = Base64.decode64(response['data']['file'])
       response
     end
 
@@ -111,7 +111,7 @@ module NSISam
 
     def update_file(key, value)
       encoded = Base64.encode64(value)
-      update(key, doc: encoded)
+      update(key, file: encoded)
     end
 
     # Pre-configure the NSISam module with default params for the NSISam::Client
