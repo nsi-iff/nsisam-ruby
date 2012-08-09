@@ -14,7 +14,7 @@ describe NSISam::Response do
     response.data.should == 'data value'
   end
 
-  it 'retrieves deleted as ? method' do
+  it 'retrieves deleted as boolean method' do
     response.should be_deleted
     NSISam::Response.new('deleted' => false).should_not be_deleted
   end

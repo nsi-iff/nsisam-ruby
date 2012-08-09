@@ -125,21 +125,21 @@ describe NSISam do
       @nsisam.get_file(key).data.should == updated_file_content
     end
 
-    # it 'stores, retrieves and updates documents for other nsi-services' do
-    #   updated_file_content = file_content + 'anything ha!'
-    #   key = @nsisam.store_file(file_content, :doc)['key']
-    #   @nsisam.get_file(key, :doc)['data']['file'].should == file_content
-    #   @nsisam.update_file(key, :doc, updated_file_content)
-    #   @nsisam.get_file(key, :doc)['data']['file'].should == updated_file_content
-    # end
+    it 'stores, retrieves and updates documents for other nsi-services' do
+      updated_file_content = file_content + 'anything ha!'
+      key = @nsisam.store_file(file_content, :doc).key
+      @nsisam.get_file(key, :doc).data.should == file_content
+      @nsisam.update_file(key, :doc, updated_file_content)
+      @nsisam.get_file(key, :doc).data.should == updated_file_content
+    end
 
-    # it 'stores, retrieves and updates videos for other nsi-services' do
-    #   updated_file_content = file_content + 'anything ha!'
-    #   key = @nsisam.store_file(file_content, :video)['key']
-    #   @nsisam.get_file(key, :video)['data']['file'].should == file_content
-    #   @nsisam.update_file(key, :video, updated_file_content)
-    #   @nsisam.get_file(key, :video)['data']['file'].should == updated_file_content
-    # end
+    it 'stores, retrieves and updates videos for other nsi-services' do
+      updated_file_content = file_content + 'anything ha!'
+      key = @nsisam.store_file(file_content, :video).key
+      @nsisam.get_file(key, :video).data.should == file_content
+      @nsisam.update_file(key, :video, updated_file_content)
+      @nsisam.get_file(key, :video).data.should == updated_file_content
+    end
   end
 
   context "get configuration" do
