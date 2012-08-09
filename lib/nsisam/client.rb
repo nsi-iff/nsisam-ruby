@@ -41,6 +41,18 @@ module NSISam
       Response.new(execute_request(request))
     end
 
+    # Store a file in SAM. If the file will be used by other NSI's service
+    # you should pass an additional 'type' parameter.
+    #
+    # @param [Object] file_content json serializable object
+    # @param [Symbol] type of the file to be stored. Can be either :doc and :video.
+    # @return [Response] object with access to the key and the sha512 checkum of the stored data
+    #
+    # @raise [NSISam::Errors::Client::AuthenticationError] when user and password doesn't match
+    # 
+    # @example
+    #   nsisam.store_file(File.read("foo.txt"))
+    #   nsisam.store_file(File.read("foo.txt"), :video)
     def store_file(file_content, type=:file)
       store(type => Base64.encode64(file_content))
     end
@@ -65,10 +77,7 @@ module NSISam
     # Recover data stored at a given SAM key
     #
     # @param [String] key of the value to acess
-    # @return [Hash] response
-    #   * "from_user" [String] the user who stored the value
-    #   * "date" [String] the date when the value was stored
-    #   * "data" [String, Hash, Array] the data stored at that key
+    # @return [Response] response object holding the file and some metadata
     #
     # @raise [NSISam::Errors::Client::KeyNotFoundError] when the key doesn't exists
     # @raise [NSISam::Errors::Client::AuthenticationError] when user and password doesn't match
@@ -83,6 +92,21 @@ module NSISam
       Response.new(response)
     end
 
+    # Recover a file stored at a given SAM key
+    #
+    # @param [String] key of the file to access
+    # @param [Symbol] type of the file to be recovered. Can be either :doc and :video.
+    # @return [Response] response object holding the file and some metadata
+    #
+    # @raise [NSISam::Errors::Client::KeyNotFoundError] when the key doesn't exists
+    # @raise [NSISam::Errors::Client::AuthenticationError] when user and password doesn't match
+    #
+    # @note Use of wrong "type" parameter can generate errors.
+    #
+    # @example
+    #   nsisam.get_file("some key")
+    #   nsisam.store_file("test", :doc) # stored at key 'test_key'
+    #   nsisam.get_file("test_key", :doc)
     def get_file(key, type=:file, expected_checksum = nil)
       response = get(key, expected_checksum)
       Response.new(
@@ -96,9 +120,7 @@ module NSISam
     #
     # @param [String] key of the data to update
     # @param [String, Hash, Array] data to be stored at the key
-    # @return [Hash] response
-    #   * "key" [String] just to value key again
-    #   * "checksum" [String] the new sha512 checksum of the key's data
+    # @return [Response] response object holding the file and some metadata
     #
     # @raise [NSISam::Errors::Client::KeyNotFoundError] when the key doesn't exists
     # @raise [NSISam::Errors::Client::AuthenticationError] when user and password doesn't match
@@ -111,8 +133,22 @@ module NSISam
       Response.new(execute_request(request))
     end
 
-    def update_file(key, type=:file, value)
-      encoded = Base64.encode64(value)
+    # Update file stored at a given SAM key
+    #
+    # @param [String] key of the file to update
+    # @param [Symbol] type of the file to be recovered. Can be either :doc and :video.
+    # @param [String] new_content content of the new file
+    # @return [Response] response object holding the file and some metadata
+    #
+    # @raise [NSISam::Errors::Client::KeyNotFoundError] when the key doesn't exists
+    # @raise [NSISam::Errors::Client::AuthenticationError] when user and password doesn't match
+    #
+    # @example
+    #   nsisam.update_file("my key", "my value")
+    #   nsisam.update_file("my key", "my value", :video)
+    #   nsisam.update_file("my key", "my value", :doc)
+    def update_file(key, type=:file, new_content)
+      encoded = Base64.encode64(new_content)
       update(key, type => encoded)
     end
 
