@@ -38,7 +38,7 @@ module NSISam
     def store(data)
       request_data = {:value => data}.to_json
       request = prepare_request :PUT, request_data
-      execute_request(request)
+      Response.new(execute_request(request))
     end
 
     def store_file(file_content, type=:file)
@@ -59,7 +59,7 @@ module NSISam
     def delete(key)
       request_data = {:key => key}.to_json
       request = prepare_request :DELETE, request_data
-      execute_request(request)
+      Response.new(execute_request(request))
     end
 
     # Recover data stored at a given SAM key
@@ -80,14 +80,16 @@ module NSISam
       request = prepare_request :GET, request_data
       response = execute_request(request)
       verify_checksum(response["data"], expected_checksum) unless expected_checksum.nil?
-      response
+      Response.new(response)
     end
 
     def get_file(key, type=:file, expected_checksum = nil)
       response = get(key, expected_checksum)
-      
-      response['data']['file'] = Base64.decode64(response['data'][type.to_s])
-      response
+      Response.new(
+        'key' => response.key,
+        'checksum' => response.checksum,
+        'data' => Base64.decode64(response.data[type.to_s]),
+        'deleted' => response.deleted?)
     end
 
     # Update data stored at a given SAM key
@@ -106,7 +108,7 @@ module NSISam
     def update(key, value)
       request_data = {:key => key, :value => value}.to_json
       request = prepare_request :POST, request_data
-      execute_request(request)
+      Response.new(execute_request(request))
     end
 
     def update_file(key, type=:file, value)
@@ -144,6 +146,7 @@ module NSISam
         response = Net::HTTP.start @host, @port do |http|
           http.request(request)
         end
+        response
       rescue Errno::ECONNREFUSED => e
         raise NSISam::Errors::Client::ConnectionRefusedError
       else
@@ -158,6 +161,5 @@ module NSISam
       sha512_checksum = Digest::SHA512.hexdigest(data)
       raise NSISam::Errors::Client::ChecksumMismatchError unless sha512_checksum == expected_checksum
     end
-
   end
 end

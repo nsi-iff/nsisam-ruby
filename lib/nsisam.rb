@@ -3,6 +3,7 @@ require File.dirname(__FILE__) + '/nsisam/configuration'
 require File.dirname(__FILE__) + '/nsisam/errors'
 require File.dirname(__FILE__) + '/nsisam/fake_server'
 require File.dirname(__FILE__) + '/nsisam/fake_client'
+require File.dirname(__FILE__) + '/nsisam/response'
 
 module NSISam
 end
