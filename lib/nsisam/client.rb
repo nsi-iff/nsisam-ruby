@@ -5,6 +5,7 @@ require "base64"
 
 require File.dirname(__FILE__) + '/configuration'
 require File.dirname(__FILE__) + '/errors'
+require File.dirname(__FILE__) + '/response'
 
 module NSISam
   class Client

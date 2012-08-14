@@ -12,6 +12,13 @@ describe "NSISam::FakeClient" do
     response.should have_key("checksum")
   end
 
+  it "can store a file" do
+    response = @nsisam.store_file("some file not in base64")
+    response.should_not be_nil
+    response.key.should_not be_nil
+    response.checksum.should_not be_nil
+  end
+
   it "can delete a stored value" do
     resp = @nsisam.store("delete this")
     response = @nsisam.delete(resp["key"])
@@ -33,6 +40,12 @@ describe "NSISam::FakeClient" do
     resp = @nsisam.store("retrieve this")
     response = @nsisam.get(resp['key'])
     response["data"].should == "retrieve this"
+  end
+
+  it "can retrieve a stored file" do
+    resp = @nsisam.store_file("file not in base64")
+    response = @nsisam.get_file(resp.key)
+    response.data.should_not be_nil
   end
 
   it "can update values in keys already stored" do
