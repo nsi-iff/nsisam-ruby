@@ -54,8 +54,8 @@ module NSISam
     # @example
     #   nsisam.store_file(File.read("foo.txt"))
     #   nsisam.store_file(File.read("foo.txt"), :video)
-    def store_file(file_content, type=:file)
-      store(type => Base64.encode64(file_content))
+    def store_file(file_content, filename, type=:file)
+      store(type => Base64.encode64(file_content), :filename => filename)
     end
 
     # Delete data at a given SAM key
@@ -113,7 +113,8 @@ module NSISam
       Response.new(
         'key' => response.key,
         'checksum' => response.checksum,
-        'data' => Base64.decode64(response.data[type.to_s]),
+        'filename' => response.data['filename'],
+        'file' => Base64.decode64(response.data[type.to_s]),
         'deleted' => response.deleted?)
     end
 

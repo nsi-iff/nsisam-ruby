@@ -4,11 +4,11 @@ module NSISam
   # @attr [Hash, String, Array] data The stored object
   class Response
     def initialize(hash)
-      @key, @checksum, @data, @deleted = hash.values_at(
-        'key', 'checksum', 'data', 'deleted')
+      @key, @checksum, @data, @deleted, @filename, @file = hash.values_at(
+        'key', 'checksum', 'data', 'deleted', 'filename', 'file')
     end
 
-    attr_reader :key, :checksum, :data
+    attr_reader :key, :checksum, :data, :filename, :file
 
     # Check if some data was deleted sucessfully 
     #
