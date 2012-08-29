@@ -5,7 +5,8 @@ describe NSISam do
   before :all do
     fake_options = { user: 'test', password: 'test', host: 'localhost',
       port: '8888' }
-    @nsisam = NSISam::Client.new(integration_options || fake_options)
+    @options = integration_options || fake_options
+    @nsisam = NSISam::Client.new(@options)
     @keys = Array.new
     @fake_sam = NSISam::FakeServerManager.new.start_server unless integrating?
   end
@@ -87,6 +88,11 @@ describe NSISam do
           and_return(:decoded_dummy)
         response = @nsisam.get_file(:key)
         response.data.should == :decoded_dummy
+      end
+
+      it "can generate a direct link to download any file" do
+        link = @nsisam.download_link_for_file('some_key')
+        link.should == "http://#{@options[:host]}:#{@options[:port]}/file/some_key"
       end
     end
   end

@@ -168,6 +168,10 @@ module NSISam
       Configuration.instance_eval(&block)
     end
 
+    def download_link_for_file(key)
+      "http://#{@host}:#{@port}/file/#{key}"
+    end
+
     private
 
     def prepare_request(verb, body)
