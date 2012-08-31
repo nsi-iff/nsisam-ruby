@@ -16,6 +16,7 @@ describe NSISam do
   end
 
   let(:file_content) { example_file_content }
+  let(:filename) { 'teste.txt' }
 
   context "cannot connect to server" do
     it "throws error if couldn't connect to the server" do
@@ -36,9 +37,9 @@ describe NSISam do
       it "encodes content before storing" do
         Base64.should_receive(:encode64).with(file_content).
           and_return(:dummy_value)
-        @nsisam.should_receive(:store).with(file: :dummy_value).
+        @nsisam.should_receive(:store).with(file: :dummy_value, filename: filename).
           and_return(:dummy_result)
-        @nsisam.store_file(file_content).should == :dummy_result
+        @nsisam.store_file(file_content, filename).should == :dummy_result
       end
     end
   end
@@ -87,7 +88,7 @@ describe NSISam do
         Base64.should_receive(:decode64).with(:dummy_value).
           and_return(:decoded_dummy)
         response = @nsisam.get_file(:key)
-        response.data.should == :decoded_dummy
+        response.file.should == :decoded_dummy
       end
 
       it "can generate a direct link to download any file" do
@@ -112,12 +113,12 @@ describe NSISam do
 
     context 'file' do
       it 'encodes content before updating' do
-        key = @nsisam.store_file(file_content).key
+        key = @nsisam.store_file(file_content, filename).key
         Base64.should_receive(:encode64).with(:dummy_content).
           and_return(:dummy_content)
-        @nsisam.should_receive(:update).with(key, file: :dummy_content).
+        @nsisam.should_receive(:update).with(key, file: :dummy_content, filename: filename).
           and_return(:dummy_result)
-        @nsisam.update_file(key, :dummy_content).should == :dummy_result
+        @nsisam.update_file(key, :dummy_content, filename).should == :dummy_result
       end
     end
   end
@@ -125,26 +126,26 @@ describe NSISam do
   context 'file storage without mocking' do
     it 'stores, retrieves and updates files' do
       updated_file_content = file_content + 'anything ha!'
-      key = @nsisam.store_file(file_content).key
-      @nsisam.get_file(key).data.should == file_content
-      @nsisam.update_file(key, updated_file_content)
-      @nsisam.get_file(key).data.should == updated_file_content
+      key = @nsisam.store_file(file_content, filename).key
+      @nsisam.get_file(key).file.should == file_content
+      @nsisam.update_file(key, updated_file_content, filename)
+      @nsisam.get_file(key).file.should == updated_file_content
     end
 
     it 'stores, retrieves and updates documents for other nsi-services' do
       updated_file_content = file_content + 'anything ha!'
-      key = @nsisam.store_file(file_content, :doc).key
-      @nsisam.get_file(key, :doc).data.should == file_content
-      @nsisam.update_file(key, :doc, updated_file_content)
-      @nsisam.get_file(key, :doc).data.should == updated_file_content
+      key = @nsisam.store_file(file_content, filename, :doc).key
+      @nsisam.get_file(key, :doc).file.should == file_content
+      @nsisam.update_file(key, :doc, updated_file_content, filename)
+      @nsisam.get_file(key, :doc).file.should == updated_file_content
     end
 
     it 'stores, retrieves and updates videos for other nsi-services' do
       updated_file_content = file_content + 'anything ha!'
-      key = @nsisam.store_file(file_content, :video).key
-      @nsisam.get_file(key, :video).data.should == file_content
-      @nsisam.update_file(key, :video, updated_file_content)
-      @nsisam.get_file(key, :video).data.should == updated_file_content
+      key = @nsisam.store_file(file_content, filename, :video).key
+      @nsisam.get_file(key, :video).file.should == file_content
+      @nsisam.update_file(key, :video, updated_file_content, filename)
+      @nsisam.get_file(key, :video).file.should == updated_file_content
     end
   end
 

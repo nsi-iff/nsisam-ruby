@@ -11,7 +11,7 @@ module NSISam
     def store(data)
       key = Time.now.to_i.to_s
       @storage[key] = JSON.load(data.to_json)
-      {'key' => key, 'checksum' => 0}
+      Response.new 'key' => key, 'checksum' => 0
     end
 
     def store_file(file, type=:file)
@@ -22,7 +22,7 @@ module NSISam
 
     def get(key, expected_checksum=nil)
       if @storage.has_key?(key)
-        {'data' => @storage[key]}
+        Response.new 'data' => @storage[key]
       else
         raise NSISam::Errors::Client::KeyNotFoundError
       end
@@ -40,7 +40,7 @@ module NSISam
     def delete(key)
       if @storage.has_key?(key)
         @storage.delete key
-        {'deleted' => true}
+        Response.new 'deleted' => true
       else
         raise NSISam::Errors::Client::KeyNotFoundError
       end
@@ -49,7 +49,7 @@ module NSISam
     def update(key, value)
       if @storage.has_key?(key)
         @storage[key] = value
-        {'key' => key, 'checksum' => 0}
+        Response.new 'key' => key, 'checksum' => 0
       else
         raise NSISam::Errors::Client::KeyNotFoundError
       end

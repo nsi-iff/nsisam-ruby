@@ -8,8 +8,8 @@ describe "NSISam::FakeClient" do
   it "can store a value" do
     response = @nsisam.store("something")
     response.should_not be_nil
-    response.should have_key("key")
-    response.should have_key("checksum")
+    response.key.should_not be_nil
+    response.checksum.should_not be_nil
   end
 
   it "can store a file" do
@@ -21,8 +21,8 @@ describe "NSISam::FakeClient" do
 
   it "can delete a stored value" do
     resp = @nsisam.store("delete this")
-    response = @nsisam.delete(resp["key"])
-    response["deleted"].should be_true
+    response = @nsisam.delete(resp.key)
+    response.should be_deleted
   end
 
   it "raises error when key not found" do
@@ -38,8 +38,8 @@ describe "NSISam::FakeClient" do
 
   it "can retrieve a stored value" do
     resp = @nsisam.store("retrieve this")
-    response = @nsisam.get(resp['key'])
-    response["data"].should == "retrieve this"
+    response = @nsisam.get(resp.key)
+    response.data.should == "retrieve this"
   end
 
   it "can retrieve a stored file" do
@@ -50,9 +50,9 @@ describe "NSISam::FakeClient" do
 
   it "can update values in keys already stored" do
     resp = @nsisam.store("update this")
-    response = @nsisam.update(resp['key'], "updated")
-    response["key"].should == resp['key']
-    @nsisam.get(response['key'])['data'].should == "updated"
-    response.should have_key("checksum")
+    response = @nsisam.update(resp.key, "updated")
+    response.key.should == resp.key
+    @nsisam.get(response.key).data.should == "updated"
+    response.checksum.should_not be_nil
   end
 end

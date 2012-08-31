@@ -110,7 +110,7 @@ module NSISam
     #   nsisam.get_file("test_key", :doc)
     def get_file(key, type=:file, expected_checksum = nil)
       response = get(key, expected_checksum)
-      Response.new(
+      response = Response.new(
         'key' => response.key,
         'checksum' => response.checksum,
         'filename' => response.data['filename'],
@@ -149,9 +149,9 @@ module NSISam
     #   nsisam.update_file("my key", "my value")
     #   nsisam.update_file("my key", "my value", :video)
     #   nsisam.update_file("my key", "my value", :doc)
-    def update_file(key, type=:file, new_content)
+    def update_file(key, type=:file, new_content, filename)
       encoded = Base64.encode64(new_content)
-      update(key, type => encoded)
+      update(key, type => encoded, filename: filename)
     end
 
     # Pre-configure the NSISam module with default params for the NSISam::Client
