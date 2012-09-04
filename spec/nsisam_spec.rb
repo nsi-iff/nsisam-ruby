@@ -4,11 +4,15 @@ require 'base64'
 describe NSISam do
   before :all do
     fake_options = { user: 'test', password: 'test', host: 'localhost',
-      port: '8888' }
+      port: '9888' }
     @options = integration_options || fake_options
     @nsisam = NSISam::Client.new(@options)
     @keys = Array.new
-    @fake_sam = NSISam::FakeServerManager.new.start_server unless integrating?
+    @fake_sam = NSISam::FakeServerManager.new.start_server(9888) unless integrating?
+  end
+
+  before :each do
+    @nsisam.expire = false
   end
 
   after :all do
@@ -172,7 +176,7 @@ describe NSISam do
         password "chunky"
         host     "localhost"
         port     "8888"
-        expire   3
+        expire   false
       end
     end
 
@@ -182,7 +186,7 @@ describe NSISam do
       sam.instance_variable_get(:@password).should == "chunky"
       sam.instance_variable_get(:@host).should == "localhost"
       sam.instance_variable_get(:@port).should == "8888"
-      sam.instance_variable_get(:@expire).should == 3
+      sam.instance_variable_get(:@expire).should == false
     end
 
     it "by initialize parameters" do

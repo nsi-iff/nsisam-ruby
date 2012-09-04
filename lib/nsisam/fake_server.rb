@@ -17,7 +17,7 @@ module NSISam
       content_type :json
       incoming = JSON.parse(request.body.read)
       key = generate_key
-      storage[key] = incoming['value']
+      storage[key] = incoming['value'] unless incoming.has_key? 'expire'
       { key: key, checksum: "0" }.to_json
     end
 
@@ -44,9 +44,14 @@ module NSISam
     post "/" do
       content_type :json
       incoming = JSON.parse(request.body.read)
+      expire = incoming['expire']
       key = incoming["key"]
       return 404 unless storage.has_key?(key)
-      storage[key] = incoming['value']
+      if incoming.has_key? 'expire'
+        storage.delete(key)
+      else
+        storage[key] = incoming['value'] 
+      end
       { key: key, checksum: 0 }.to_json
     end
   end
