@@ -33,6 +33,14 @@ describe NSISam do
       response.should respond_to("checksum")
     end
 
+    it "can store a value with an expire time" do
+      @nsisam.expire = 2
+      response = @nsisam.store('teste')
+      sleep(3) 
+      expect { @nsisam.get(response.key) }.to raise_error(NSISam::Errors::Client::KeyNotFoundError)
+      @nsisam.expire = false
+    end
+
     context "file" do
       it "encodes content before storing" do
         Base64.should_receive(:encode64).with(file_content).
@@ -107,6 +115,14 @@ describe NSISam do
       @nsisam.get(key).data.should == 'updated'
     end
 
+    it "can update values with an expire time to the new value" do
+      response = @nsisam.store('test')
+      @nsisam.expire = 2
+      @nsisam.update(response.key, 'test 2')
+      sleep(3)
+      expect { @nsisam.get(response.key) }.to raise_error(NSISam::Errors::Client::KeyNotFoundError)
+    end
+
     it "raises error when key not found" do
       expect { @nsisam.update("dont exist ruby is fast", "foo") }.to raise_error(NSISam::Errors::Client::KeyNotFoundError)
     end
@@ -156,6 +172,7 @@ describe NSISam do
         password "chunky"
         host     "localhost"
         port     "8888"
+        expire   3
       end
     end
 
@@ -165,14 +182,16 @@ describe NSISam do
       sam.instance_variable_get(:@password).should == "chunky"
       sam.instance_variable_get(:@host).should == "localhost"
       sam.instance_variable_get(:@port).should == "8888"
+      sam.instance_variable_get(:@expire).should == 3
     end
 
     it "by initialize parameters" do
-      sam = NSISam::Client.new(user: 'luckystiff', password: 'bacon', host: 'why.com', port: '9999')
+      sam = NSISam::Client.new(user: 'luckystiff', password: 'bacon', host: 'why.com', port: '9999', expire: 5)
       sam.instance_variable_get(:@user).should == "luckystiff"
       sam.instance_variable_get(:@password).should == "bacon"
       sam.instance_variable_get(:@host).should == "why.com"
       sam.instance_variable_get(:@port).should == "9999"
+      sam.instance_variable_get(:@expire).should == 5
     end
   end
 end

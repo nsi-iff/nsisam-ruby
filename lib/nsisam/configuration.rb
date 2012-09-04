@@ -46,11 +46,22 @@ module NSISam
           @port
         end
 
+        # Set the default {NSISam::Client} expire time
+        #
+        #
+        # @param [Fixnum] expire time to set
+        #
+        # @return [Fixnum] the expire set
+        def expire(expire = nil)
+          @expire = expire unless expire.nil?
+          @expire
+        end
+
         # See how are the settings
         #
         # @return [Hash] actual settings
         def settings
-          {user: @user, password: @password, host: @host, port: @port}
+          {user: @user, password: @password, host: @host, port: @port, expire: @expire}
         end
       end
     end

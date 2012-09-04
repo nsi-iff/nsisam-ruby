@@ -10,6 +10,8 @@ require File.dirname(__FILE__) + '/response'
 module NSISam
   class Client
 
+    attr_accessor :expire
+
     # Initialize a client to a SAM node hosted at a specific url
     #
     # @param [Hash] optional hash with user, password, host and port of the SAM node
@@ -23,6 +25,7 @@ module NSISam
       @password = params[:password]
       @host = params[:host]
       @port = params[:port]
+      @expire = params[:expire]
     end
 
     # Store a given data in SAM
@@ -37,8 +40,9 @@ module NSISam
     # @example
     #   nsisam.store("something")
     def store(data)
-      request_data = {:value => data}.to_json
-      request = prepare_request :PUT, request_data
+      request_data = {:value => data}
+      request_data[:expire] = @expire if @expire
+      request = prepare_request :PUT, request_data.to_json
       Response.new(execute_request(request))
     end
 
@@ -130,8 +134,9 @@ module NSISam
     # @example
     #   nsisam.update("my key", "my value")
     def update(key, value)
-      request_data = {:key => key, :value => value}.to_json
-      request = prepare_request :POST, request_data
+      request_data = {:key => key, :value => value}
+      request_data[:expire] = @expire if @expire
+      request = prepare_request :POST, request_data.to_json
       Response.new(execute_request(request))
     end
 

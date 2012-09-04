@@ -23,14 +23,21 @@ describe "NSISam::Client::Configuration" do
     Configuration.port.should == '8888'
   end
 
+  it "set and return default expire time" do
+    Configuration.expire 5
+    Configuration.expire.should == 5
+  end
+
   it "return a hash of attributes" do
     Configuration.instance_eval do
       user     "why"
       password "chunky"
       host     "localhost"
       port     "8888"
+      expire   8
     end
     Configuration.settings.should == {user: "why", password: "chunky",
-                                      host: "localhost", port: "8888"}
+                                      host: "localhost", port: "8888",
+                                      expire: 8}
   end
 end
