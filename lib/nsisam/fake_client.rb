@@ -4,19 +4,22 @@ require File.dirname(__FILE__) + '/response'
 
 module NSISam
   class FakeClient
+
+    attr_accessor :expire
+
     def initialize
       @storage = {}
     end
 
     def store(data)
       key = Time.now.to_i.to_s
-      @storage[key] = JSON.load(data.to_json)
+      @storage[key] = JSON.load(data.to_json) unless @expire
       Response.new 'key' => key, 'checksum' => 0
     end
 
     def store_file(file, type=:file)
       key = Time.now.to_i.to_s
-      @storage[key] = {type.to_s => Base64.encode64(file)}.to_json
+      @storage[key] = {type.to_s => Base64.encode64(file)}.to_json unless @expire
       Response.new "key" => key, "checksum" => 0
     end
 
@@ -48,8 +51,12 @@ module NSISam
 
     def update(key, value)
       if @storage.has_key?(key)
-        @storage[key] = value
-        Response.new 'key' => key, 'checksum' => 0
+        if @expire
+          @storage.delete(key)
+        else
+          @storage[key] = value 
+        end
+        Response.new 'key' => key, 'checksum' => 0 
       else
         raise NSISam::Errors::Client::KeyNotFoundError
       end
