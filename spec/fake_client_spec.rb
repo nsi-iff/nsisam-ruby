@@ -1,4 +1,5 @@
 require File.expand_path(File.dirname(__FILE__) + '/spec_helper')
+require 'net/http'
 
 describe "NSISam::FakeClient" do
   before :all do
@@ -13,7 +14,7 @@ describe "NSISam::FakeClient" do
   end
 
   it "can store a file" do
-    response = @nsisam.store_file("some file not in base64")
+    response = @nsisam.store_file("some file not in base64", 'dumb.txt')
     response.should_not be_nil
     response.key.should_not be_nil
     response.checksum.should_not be_nil
@@ -43,7 +44,7 @@ describe "NSISam::FakeClient" do
   end
 
   it "can retrieve a stored file" do
-    resp = @nsisam.store_file("file not in base64")
+    resp = @nsisam.store_file("file not in base64", 'dumb.txt')
     response = @nsisam.get_file(resp.key)
     response.data.should_not be_nil
   end
@@ -55,4 +56,21 @@ describe "NSISam::FakeClient" do
     @nsisam.get(response.key).data.should == "updated"
     response.checksum.should_not be_nil
   end
+
+  context "can host files" do
+    it "stored by #store_file" do
+      response = @nsisam.store_file("file not in base64", 'dumb.txt')
+      response.key.should_not be_nil
+      request = Net::HTTP.get_response(URI.parse("http://#{@nsisam.host}:#{@nsisam.port}/file/#{response.key}"))
+      request.body.should == "file not in base64"
+    end
+
+    it "stored by #store in a dict with file and filename" do
+      data = {file: Base64.encode64('a file'), filename: 'dumb.txt'}
+      response = @nsisam.store(data)
+      request = Net::HTTP.get_response(URI.parse("http://#{@nsisam.host}:#{@nsisam.port}/file/#{response.key}"))
+      request.body.should == "a file"
+    end
+  end
+
 end
