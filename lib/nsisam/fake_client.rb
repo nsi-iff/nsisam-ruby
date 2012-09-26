@@ -1,7 +1,10 @@
 require 'json'
 require 'base64'
 require File.dirname(__FILE__) + '/response'
-require 'fakeweb'
+require 'webmock'
+include WebMock::API
+WebMock.allow_net_connect!
+
 
 module NSISam
   class FakeClient
@@ -19,7 +22,7 @@ module NSISam
       key = Time.now.nsec.to_s
       @storage[key] = JSON.load(data.to_json) unless @expire
       if data.kind_of?(Hash) and data.has_key?(:file) and data.has_key?(:filename)
-        FakeWeb.register_uri(:get, "http://#{@host}:#{@port}/file/#{key}", body: Base64.decode64(data[:file]))
+        stub_request(:get, "http://#{@host}:#{@port}/file/#{key}").to_return(body: Base64.decode64(data[:file]))
       end
       Response.new 'key' => key, 'checksum' => 0
     end
@@ -27,7 +30,7 @@ module NSISam
     def store_file(file, filename, type=:file)
       key = Time.now.to_i.to_s
       @storage[key] = {type.to_s => Base64.encode64(file), filename: filename}.to_json unless @expire
-      FakeWeb.register_uri(:get, "http://#{@host}:#{@port}/file/#{key}", body: file)
+      stub_request(:get, "http://#{@host}:#{@port}/file/#{key}").to_return(body: file)
       Response.new "key" => key, "checksum" => 0
     end
 
@@ -62,12 +65,21 @@ module NSISam
         if @expire
           @storage.delete(key)
         else
-          @storage[key] = value 
+          @storage[key] = value
         end
-        Response.new 'key' => key, 'checksum' => 0 
+        Response.new 'key' => key, 'checksum' => 0
       else
         raise NSISam::Errors::Client::KeyNotFoundError
       end
     end
+
+    def update_file(key, file, filename)
+      hash = {file: file, filename: filename}
+      @storage[key] = hash
+      remove_request_stub(:get, "http://#{@host}:#{@port}/file/#{key}")
+      stub_request(:get, "http://#{@host}:#{@port}/file/#{key}").to_return(body: file)
+      Response.new "key" => key, "checksum" => 0
+    end
+
   end
 end
