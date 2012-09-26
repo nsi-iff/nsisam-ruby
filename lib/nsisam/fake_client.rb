@@ -12,10 +12,13 @@ module NSISam
     attr_reader :host, :port
 
     def initialize(host="localhost", port="8888")
-      WebMock.allow_net_connect!
       @storage = {}
       @host = host
       @port = port
+    end
+
+    def allow_net
+      WebMock.allow_net_connect!
     end
 
     def download_link_for_file(key)
