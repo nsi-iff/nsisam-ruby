@@ -1,8 +1,6 @@
 require 'json'
 require 'base64'
 require File.dirname(__FILE__) + '/response'
-require 'webmock'
-include WebMock::API
 
 
 module NSISam
@@ -28,16 +26,12 @@ module NSISam
     def store(data)
       key = Time.now.nsec.to_s
       @storage[key] = JSON.load(data.to_json) unless @expire
-      if data.kind_of?(Hash) and data.has_key?(:file) and data.has_key?(:filename)
-        stub_request(:get, "http://#{@host}:#{@port}/file/#{key}").to_return(body: Base64.decode64(data[:file]))
-      end
       Response.new 'key' => key, 'checksum' => 0
     end
 
     def store_file(file, filename, type=:file)
       key = Time.now.to_i.to_s
       @storage[key] = {type.to_s => Base64.encode64(file), filename: filename}.to_json unless @expire
-      stub_request(:get, "http://#{@host}:#{@port}/file/#{key}").to_return(body: file)
       Response.new "key" => key, "checksum" => 0
     end
 
@@ -84,7 +78,6 @@ module NSISam
       hash = {file: file, filename: filename}
       @storage[key] = hash
       remove_request_stub(:get, "http://#{@host}:#{@port}/file/#{key}")
-      stub_request(:get, "http://#{@host}:#{@port}/file/#{key}").to_return(body: file)
       Response.new "key" => key, "checksum" => 0
     end
 
