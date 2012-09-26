@@ -3,7 +3,6 @@ require 'base64'
 require File.dirname(__FILE__) + '/response'
 require 'webmock'
 include WebMock::API
-WebMock.allow_net_connect!
 
 
 module NSISam
@@ -13,6 +12,7 @@ module NSISam
     attr_reader :host, :port
 
     def initialize(host="localhost", port="8888")
+      WebMock.allow_net_connect!
       @storage = {}
       @host = host
       @port = port
