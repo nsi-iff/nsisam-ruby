@@ -68,29 +68,29 @@ describe "NSISam::FakeClient" do
     it "stored by #store in a dict with file and filename" do
       data = {file: Base64.encode64('a file'), filename: 'dumb.txt'}
       response = @nsisam.store(data)
-      request = Net::HTTP.get_response(URI.parse("http://#{@nsisam.host}:#{@nsisam.port}/file/#{response.key}"))
+      request = Net::HTTP.get_response(URI.parse(@nsisam.download_link_for_file(response.key)))
       request.body.should == "a file"
     end
 
     it "should update the hosted file when the file is updated through #store" do
       data = {file: Base64.encode64('a file'), filename: 'dumb.txt'}
       response = @nsisam.store(data)
-      request = Net::HTTP.get_response(URI.parse("http://#{@nsisam.host}:#{@nsisam.port}/file/#{response.key}"))
+      request = Net::HTTP.get_response(URI.parse(@nsisam.download_link_for_file(response.key)))
       request.body.should == "a file"
 
       data = {file: Base64.encode64('another file'), filename: 'dumb.txt'}
       response = @nsisam.store(data)
-      request = Net::HTTP.get_response(URI.parse("http://#{@nsisam.host}:#{@nsisam.port}/file/#{response.key}"))
+      request = Net::HTTP.get_response(URI.parse(@nsisam.download_link_for_file(response.key)))
       request.body.should == "another file"
     end
 
     it "should update the hosted file when the file is updated through #store_file" do
       response = @nsisam.store_file('a file', 'dumb.txt')
-      request = Net::HTTP.get_response(URI.parse("http://#{@nsisam.host}:#{@nsisam.port}/file/#{response.key}"))
+      request = Net::HTTP.get_response(URI.parse(@nsisam.download_link_for_file(response.key)))
       request.body.should == "a file"
 
       response = @nsisam.update_file(response.key, 'another file', 'dumb.txt')
-      request = Net::HTTP.get_response(URI.parse("http://#{@nsisam.host}:#{@nsisam.port}/file/#{response.key}"))
+      request = Net::HTTP.get_response(URI.parse(@nsisam.download_link_for_file(response.key)))
       request.body.should == "another file"
     end
   end

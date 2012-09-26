@@ -18,6 +18,10 @@ module NSISam
       @port = port
     end
 
+    def download_link_for_file(key)
+      "http://#{@host}:#{@port}/file/#{key}"
+    end
+
     def store(data)
       key = Time.now.nsec.to_s
       @storage[key] = JSON.load(data.to_json) unless @expire
