@@ -4,7 +4,6 @@ require 'net/http'
 describe "NSISam::FakeClient" do
   before :all do
     @nsisam = NSISam::FakeClient.new
-    @nsisam.allow_net
   end
 
   it "can store a value" do
@@ -58,6 +57,5 @@ describe "NSISam::FakeClient" do
     response.checksum.should_not be_nil
   end
 
-  end
 
 end

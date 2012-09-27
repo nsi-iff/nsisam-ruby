@@ -15,10 +15,6 @@ module NSISam
       @port = port
     end
 
-    def allow_net
-      WebMock.allow_net_connect!
-    end
-
     def download_link_for_file(key)
       "http://#{@host}:#{@port}/file/#{key}"
     end
