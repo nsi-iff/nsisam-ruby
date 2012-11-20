@@ -4,11 +4,11 @@ require 'base64'
 describe NSISam do
   before :all do
     fake_options = { user: 'test', password: 'test', host: 'localhost',
-      port: '9888' }
+      port: '7888' }
     @options = integration_options || fake_options
     @nsisam = NSISam::Client.new(@options)
     @keys = Array.new
-    @fake_sam = NSISam::FakeServerManager.new.start_server(9888) unless integrating?
+    @fake_sam = NSISam::FakeServerManager.new.start_server(7888) unless integrating?
   end
 
   before :each do
@@ -40,7 +40,7 @@ describe NSISam do
     it "can store a value with an expire time" do
       @nsisam.expire = 2
       response = @nsisam.store('teste')
-      sleep(3) 
+      sleep(3)
       expect { @nsisam.get(response.key) }.to raise_error(NSISam::Errors::Client::KeyNotFoundError)
       @nsisam.expire = false
     end

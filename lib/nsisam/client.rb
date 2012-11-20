@@ -42,7 +42,7 @@ module NSISam
     def store(data)
       request_data = {:value => data}
       request_data[:expire] = @expire if @expire
-      request = prepare_request :PUT, request_data.to_json
+      request = prepare_request :POST, request_data.to_json
       Response.new(execute_request(request))
     end
 
@@ -54,7 +54,7 @@ module NSISam
     # @return [Response] object with access to the key and the sha512 checkum of the stored data
     #
     # @raise [NSISam::Errors::Client::AuthenticationError] when user and password doesn't match
-    # 
+    #
     # @example
     #   nsisam.store_file(File.read("foo.txt"))
     #   nsisam.store_file(File.read("foo.txt"), :video)
@@ -136,7 +136,7 @@ module NSISam
     def update(key, value)
       request_data = {:key => key, :value => value}
       request_data[:expire] = @expire if @expire
-      request = prepare_request :POST, request_data.to_json
+      request = prepare_request :PUT, request_data.to_json
       Response.new(execute_request(request))
     end
 

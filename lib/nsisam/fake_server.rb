@@ -13,7 +13,7 @@ module NSISam
       rand.to_s
     end
 
-    put "/" do
+    post "/" do
       content_type :json
       incoming = JSON.parse(request.body.read)
       key = generate_key
@@ -41,7 +41,7 @@ module NSISam
       { deleted: true }.to_json
     end
 
-    post "/" do
+    put "/" do
       content_type :json
       incoming = JSON.parse(request.body.read)
       expire = incoming['expire']
@@ -50,7 +50,7 @@ module NSISam
       if incoming.has_key? 'expire'
         storage.delete(key)
       else
-        storage[key] = incoming['value'] 
+        storage[key] = incoming['value']
       end
       { key: key, checksum: 0 }.to_json
     end
