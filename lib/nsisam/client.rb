@@ -190,7 +190,7 @@ module NSISam
 
     def execute_request(request)
       begin
-        response = Net::HTTP.start @host, @port do |http|
+        response = Net::HTTP.start @host, @port, :read_timeout => 60*60*30, :open_timeout => 60*60*30 do |http|
           http.request(request)
         end
         response
